@@ -42,7 +42,7 @@ def game_over(screen: pg.display) -> None:
         pg.draw.rect(bg_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
         screen.blit(bg_img, (0, 0))
         pg.display.update()
-        time.sleep(0.1)
+        time.sleep(0.09)
     bgc_img = pg.image.load("fig/8.png")
     for _ in range(10):
         screen.blit(bgc_img, [random.randint(
@@ -56,6 +56,12 @@ def game_over(screen: pg.display) -> None:
 
 
 def add_bomb():
+    '''
+    爆弾を追加する,最大20個まで
+    bombsのリストに追加する
+    引数: なし
+    戻り値: なし
+    '''
     if len(bombs) > 20:
         return
     bd_img = pg.Surface((20, 20))
@@ -70,12 +76,25 @@ def add_bomb():
 
     bombs.append((bd_img, bd_rct, vx, vy))
 
-
+def create_rotated_images(kk_img):
+    # 押下キーに対する移動量の合計値タプルをキーとし、rotozoomしたSurfaceを値とする辞書を準備
+    r_pg = {
+        (0, -5): pg.transform.rotozoom(kk_img, -90, 0.9),   # 上
+        (5, -5): pg.transform.rotozoom(kk_img, -135, 0.9),  # 右上
+        (5, 0): pg.transform.rotozoom(kk_img, -180, 0.9),   # 右
+        (5, 5): pg.transform.rotozoom(kk_img, -225, 0.9),  # 右下
+        (0, 5): pg.transform.rotozoom(kk_img, 45, 0.9),  # 下
+        (-5, 5): pg.transform.rotozoom(kk_img, 45, 0.9), # 左下
+        (-5, 0): pg.transform.rotozoom(kk_img, 0, 0.9), # 左
+        (-5, -5): pg.transform.rotozoom(kk_img, -45, 0.9) # 左上
+    }
+    return r_pg
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_img = pg.image.load("fig/3.png")
+    rotated_images = create_rotated_images(kk_img)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     bd_img = pg.surface.Surface((20, 20))
@@ -99,9 +118,9 @@ def main():
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         # if key_lst[pg.K_UP]:
-        #     sum_mv[1] -= 5
+        #     sum_mv[5] -= 5
         # if key_lst[pg.K_DOWN]:
-        #     sum_mv[1] += 5
+        #     sum_mv[5] += 5
         # if key_lst[pg.K_LEFT]:
         #     sum_mv[0] -= 5
         # if key_lst[pg.K_RIGHT]:
@@ -115,7 +134,13 @@ def main():
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+        if (tuple(sum_mv)) != (0, 0):
+            kk_img = rotated_images[tuple(sum_mv)]
+
+            
+        
         screen.blit(kk_img, kk_rct)
+
         for i, (bd_img, bd_rct, vx, vy) in enumerate(bombs):
             bd_rct.move_ip(vx, vy)
             yoko, tate = check_bound(bd_rct)
@@ -126,11 +151,11 @@ def main():
 
             screen.blit(bd_img, bd_rct)
 
-            if kk_rct.colliderect(bd_rct):
-                print("Game Over")
-                return game_over(screen)
+            # if kk_rct.colliderect(bd_rct):
+            #     print("Game Over")
+            #     return game_over(screen)
         pg.display.update()
-        tmr += 1
+        tmr += 5
         clock.tick(50)
 
 
