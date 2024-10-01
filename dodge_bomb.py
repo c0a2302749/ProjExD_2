@@ -12,6 +12,7 @@ DELTA = {
     pg.K_LEFT: (-5, 0),
     pg.K_RIGHT: (5, 0),
 }
+bombs = []
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -54,6 +55,20 @@ def game_over(screen: pg.display) -> None:
     time.sleep(5)
 
 
+def add_bomb():
+    if len(bombs) > 20:
+        return
+    bd_img = pg.Surface((20, 20))
+    bd_img.set_colorkey((0, 0, 0))
+    pg.draw.circle(bd_img, (255, 0, 0), (10, 10), 10)
+    bd_rct = bd_img.get_rect()
+    bd_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+
+    # ランダムな速度を設定
+    vx = random.choice([-5, -4, -3, 3, 4, 5])
+    vy = random.choice([-5, -4, -3, 3, 4, 5])
+
+    bombs.append((bd_img, bd_rct, vx, vy))
 
 
 def main():
@@ -76,6 +91,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
+        if tmr % 50 == 0:
+            add_bomb()
+
         screen.blit(bg_img, [0, 0])
 
         key_lst = pg.key.get_pressed()
@@ -98,16 +116,19 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bd_rct.move_ip(vx, vy)
-        yoko, tate = check_bound(bd_rct)
-        if not yoko:
-            vx *= -1
-        if not tate:
-            vy *= -1
-        screen.blit(bd_img, bd_rct)
-        if kk_rct.colliderect(bd_rct):
-            print("Game Over")
-            return game_over(screen)
+        for i, (bd_img, bd_rct, vx, vy) in enumerate(bombs):
+            bd_rct.move_ip(vx, vy)
+            yoko, tate = check_bound(bd_rct)
+            if not yoko:
+                bombs[i] = (bd_img, bd_rct, -vx, vy)
+            if not tate:
+                bombs[i] = (bd_img, bd_rct, vx, -vy)
+
+            screen.blit(bd_img, bd_rct)
+
+            if kk_rct.colliderect(bd_rct):
+                print("Game Over")
+                return game_over(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
