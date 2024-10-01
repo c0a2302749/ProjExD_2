@@ -105,6 +105,7 @@ def create_rotated_images(kk_img: pg.Surface) -> dict[tuple[int, int], pg.Surfac
     }
     return r_pg
 def main():
+    
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")
@@ -126,7 +127,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
-        if tmr % 50 == 0:
+        if tmr % 150 == 0:
             add_bomb(bombs)
 
         screen.blit(bg_img, [0, 0])
