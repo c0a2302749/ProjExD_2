@@ -30,6 +30,11 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
 
 
 def game_over(screen: pg.display) -> None:
+    '''
+    ゲームオーバー時にだんだん画面を暗くし、最終的にゲームを終了する
+    引数: pg.display
+    戻り値: なし
+    '''
     bg_img = pg.surface.Surface((WIDTH, HEIGHT))
     for alpha in range(0, 129, 5):
         bg_img.set_alpha(alpha)
@@ -47,6 +52,8 @@ def game_over(screen: pg.display) -> None:
 
     pg.display.update()
     time.sleep(5)
+
+
 
 
 def main():
