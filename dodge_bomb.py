@@ -92,7 +92,11 @@ def add_bomb(bombs: list[tuple[pg.Surface, pg.Rect, int, int, int]]) -> None:
     bombs.append(generate_bomb(r))
 def create_rotated_images(kk_img: pg.Surface) -> dict[tuple[int, int], pg.Surface]:
     # 押下キーに対する移動量の合計値タプルをキーとし、rotozoomしたSurfaceを値とする辞書を準備
-
+    '''
+    こうかとんの画像を回転させた画像を生成する
+    引数: こうかとんの画像
+    戻り値: こうかとんの画像を回転させた画像の辞書
+    '''
     r_pg = {
         (0, -5): pg.transform.rotozoom(kk_img, -90, 0.9),   # 上
         (5, -5): pg.transform.rotozoom(kk_img, -135, 0.9),  # 右上
