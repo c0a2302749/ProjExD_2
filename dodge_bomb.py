@@ -29,6 +29,26 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+def game_over(screen: pg.display) -> None:
+    bg_img = pg.surface.Surface((WIDTH, HEIGHT))
+    for alpha in range(0, 129, 5):
+        bg_img.set_alpha(alpha)
+        pg.draw.rect(bg_img, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
+        screen.blit(bg_img, (0, 0))
+        pg.display.update()
+        time.sleep(0.1)
+    bgc_img = pg.image.load("fig/8.png")
+    for _ in range(10):
+        screen.blit(bgc_img, [random.randint(
+            0, WIDTH), random.randint(0, HEIGHT)])
+    font = pg.font.Font(None, 80)
+    text = font.render("Game Over", True, (255, 255, 255))
+    screen.blit(text, [WIDTH // 2 - 200, HEIGHT // 2 - 50])
+
+    pg.display.update()
+    time.sleep(5)
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -66,6 +86,7 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
+
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
@@ -79,7 +100,7 @@ def main():
         screen.blit(bd_img, bd_rct)
         if kk_rct.colliderect(bd_rct):
             print("Game Over")
-            return
+            return game_over(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
