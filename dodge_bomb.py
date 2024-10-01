@@ -92,6 +92,7 @@ def add_bomb(bombs):
     bombs.append(generate_bomb(r))
 def create_rotated_images(kk_img):
     # 押下キーに対する移動量の合計値タプルをキーとし、rotozoomしたSurfaceを値とする辞書を準備
+
     r_pg = {
         (0, -5): pg.transform.rotozoom(kk_img, -90, 0.9),   # 上
         (5, -5): pg.transform.rotozoom(kk_img, -135, 0.9),  # 右上
