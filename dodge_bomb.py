@@ -12,7 +12,6 @@ DELTA = {
     pg.K_LEFT: (-5, 0),
     pg.K_RIGHT: (5, 0),
 }
-bombs = []
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -55,27 +54,42 @@ def game_over(screen: pg.display) -> None:
     time.sleep(5)
 
 
-def add_bomb():
+def generate_bomb(r):
     '''
-    爆弾を追加する,最大20個まで
-    bombsのリストに追加する
-    引数: なし
-    戻り値: なし
+    爆弾の画像, 爆弾のrect, x軸方向の速度, y軸方向の速度を生成する
+    引数: 爆弾の半径
+    戻り値: 爆弾の画像, 爆弾のrect, x軸方向の速度, y
+
     '''
-    if len(bombs) > 20:
-        return
-    bd_img = pg.Surface((20, 20))
+    accs = [a for a in range(1, 11)]
+    bd_img = pg.Surface((20*r, 20*r))
     bd_img.set_colorkey((0, 0, 0))
-    pg.draw.circle(bd_img, (255, 0, 0), (10, 10), 10)
+    pg.draw.circle(bd_img, (255, 0, 0), (10*r, 10*r), 10*r)
     bd_rct = bd_img.get_rect()
     bd_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+    vx, vy = random.choice([-5, 5]), random.choice([-5, 5])
+    acc = random.choice(accs)
+    return bd_img, bd_rct, vx, vy, acc
 
-    # ランダムな速度を設定
-    vx = random.choice([-5, -4, -3, 3, 4, 5])
-    vy = random.choice([-5, -4, -3, 3, 4, 5])
+def create_bombs():
+    '''
+    爆弾を生成する
+    引数: なし
+    戻り値: 爆弾のリスト
 
-    bombs.append((bd_img, bd_rct, vx, vy))
-
+    '''
+    bombs = []
+    for r in range(1, 2):
+        bombs.append(generate_bomb(r))
+    return bombs
+def add_bomb(bombs):
+    '''
+    爆弾を追加する
+    引数: 爆弾のリスト
+    戻り値: なし
+    '''
+    r = random.randint(1, 6)
+    bombs.append(generate_bomb(r))
 def create_rotated_images(kk_img):
     # 押下キーに対する移動量の合計値タプルをキーとし、rotozoomしたSurfaceを値とする辞書を準備
     r_pg = {
@@ -102,6 +116,7 @@ def main():
     pg.draw.circle(bd_img, (255, 0, 0), (10, 10), 10)
     bd_rct = bd_img.get_rect()
     bd_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+    bombs = create_bombs()
     vx, vy = 5, 5
     clock = pg.time.Clock()
     tmr = 0
@@ -111,7 +126,7 @@ def main():
             if event.type == pg.QUIT:
                 return
         if tmr % 50 == 0:
-            add_bomb()
+            add_bomb(bombs)
 
         screen.blit(bg_img, [0, 0])
 
@@ -141,16 +156,15 @@ def main():
         
         screen.blit(kk_img, kk_rct)
 
-        for i, (bd_img, bd_rct, vx, vy) in enumerate(bombs):
-            bd_rct.move_ip(vx, vy)
+        for i,(bd_img, bd_rct, vx, vy, acc) in enumerate(bombs):
+            bd_rct.move_ip(vx * acc, vy * acc)
             yoko, tate = check_bound(bd_rct)
             if not yoko:
-                bombs[i] = (bd_img, bd_rct, -vx, vy)
+                vx = -vx
             if not tate:
-                bombs[i] = (bd_img, bd_rct, vx, -vy)
-
+                vy = -vy
+            bombs[i]=(bd_img, bd_rct, vx, vy, acc)
             screen.blit(bd_img, bd_rct)
-
             if kk_rct.colliderect(bd_rct):
                 print("Game Over")
                 return game_over(screen)
