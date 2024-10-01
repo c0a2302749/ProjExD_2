@@ -54,7 +54,7 @@ def game_over(screen: pg.display) -> None:
     time.sleep(5)
 
 
-def generate_bomb(r):
+def generate_bomb(r: int) -> tuple[pg.Surface, pg.Rect, int, int, int]:
     '''
     爆弾の画像, 爆弾のrect, x軸方向の速度, y軸方向の速度を生成する
     引数: 爆弾の半径
@@ -71,7 +71,7 @@ def generate_bomb(r):
     acc = random.choice(accs)
     return bd_img, bd_rct, vx, vy, acc
 
-def create_bombs():
+def create_bombs() -> list[tuple[pg.Surface, pg.Rect, int, int, int]]:
     '''
     爆弾を生成する
     引数: なし
@@ -82,7 +82,7 @@ def create_bombs():
     for r in range(1, 2):
         bombs.append(generate_bomb(r))
     return bombs
-def add_bomb(bombs):
+def add_bomb(bombs: list[tuple[pg.Surface, pg.Rect, int, int, int]]) -> None:
     '''
     爆弾を追加する
     引数: 爆弾のリスト
@@ -90,7 +90,7 @@ def add_bomb(bombs):
     '''
     r = random.randint(1, 6)
     bombs.append(generate_bomb(r))
-def create_rotated_images(kk_img):
+def create_rotated_images(kk_img: pg.Surface) -> dict[tuple[int, int], pg.Surface]:
     # 押下キーに対する移動量の合計値タプルをキーとし、rotozoomしたSurfaceを値とする辞書を準備
 
     r_pg = {
