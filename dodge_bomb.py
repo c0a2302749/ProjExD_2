@@ -151,9 +151,9 @@ def main():
 
             screen.blit(bd_img, bd_rct)
 
-            # if kk_rct.colliderect(bd_rct):
-            #     print("Game Over")
-            #     return game_over(screen)
+            if kk_rct.colliderect(bd_rct):
+                print("Game Over")
+                return game_over(screen)
         pg.display.update()
         tmr += 5
         clock.tick(50)
