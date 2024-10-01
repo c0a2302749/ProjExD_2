@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -76,6 +77,9 @@ def main():
         if not tate:
             vy *= -1
         screen.blit(bd_img, bd_rct)
+        if kk_rct.colliderect(bd_rct):
+            print("Game Over")
+            return
         pg.display.update()
         tmr += 1
         clock.tick(50)
